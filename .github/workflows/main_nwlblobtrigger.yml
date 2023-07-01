@@ -41,3 +41,4 @@ jobs:
           slot-name: 'Production'
           package: '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/output'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_960DD7323A8D4FE18F779380D610D0E0 }}
+        working-directory: nwl-blob-trigger
