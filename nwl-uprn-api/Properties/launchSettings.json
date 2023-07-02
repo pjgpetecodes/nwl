@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "nwl_uprn_api": {
+      "commandName": "Project",
+      "commandLineArgs": "--port 7075",
+      "launchBrowser": false
+    }
+  }
+}

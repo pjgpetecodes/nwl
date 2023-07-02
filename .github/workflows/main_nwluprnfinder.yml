@@ -31,6 +31,7 @@ jobs:
           pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
           dotnet build --configuration Release --output ./output
           popd
+        working-directory: nwl-uprn-finder
 
       - name: 'Run Azure Functions Action'
         uses: Azure/functions-action@v1
@@ -38,5 +39,5 @@ jobs:
         with:
           app-name: 'nwluprnfinder'
           slot-name: 'Production'
-          package: '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/output'
+          package: '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/nwl-uprn-finder/output'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_3CB5C1686ABC43198A0EB67BC6C8F0BE }}
