@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 using System.Threading.Tasks;
+using CsvHelper;
 
 namespace nwl.chunker
 {
@@ -27,10 +28,38 @@ namespace nwl.chunker
             CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
             CloudBlobContainer container = blobClient.GetContainerReference("uploads");
 
-            CloudBlockBlob blockBlob = container.GetBlockBlobReference(myQueueItem);
+            // parse out the blob name from "Blob Name: AllData.csv\nBlob Size: 1793704 Bytes\n"
+            string blobName = myQueueItem.Substring(11, myQueueItem.IndexOf("\n") - 11);
 
+            CloudBlockBlob blockBlob = container.GetBlockBlobReference(blobName);
 
-            
+            int NumberOfRows = 0;
+
+            // Use the CSV Helper library to read the CSV file
+            using (var stream = await blockBlob.OpenReadAsync())
+            using (var reader = new System.IO.StreamReader(stream))
+            using (var csv = new CsvReader(reader, System.Globalization.CultureInfo.InvariantCulture))
+            {
+
+                
+                // Read the CSV file and create a new CsvLine object for each line
+                while (csv.Read())
+                {
+                    var csvLine = csv.GetRecord<CsvLine>();
+
+                    // Create a new EventData object from the CsvLine object
+                    var newEventBody = new EventData(System.Text.Json.JsonSerializer.Serialize(csvLine));
+
+                    // Queue the message to be sent in the background by adding it to the collector.
+                    // If only the event is passed, an Event Hub partition to be be assigned via
+                    // round-robin for each batch.
+                    await outputEvents.AddAsync(newEventBody);
+
+                    NumberOfRows++;
+                }
+            }      
+
+            log.LogInformation($"Successfully processed {NumberOfRows.ToString()} rows from {blobName}");
 
             // Queue the message to be sent in the background by adding it to the collector.
             // If only the event is passed, an Event Hub partition to be be assigned via
