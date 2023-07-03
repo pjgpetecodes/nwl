@@ -6,15 +6,23 @@ using System.Threading.Tasks;
 using Azure.Messaging.EventHubs;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
+using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
 
 namespace nwl.uprnfinder
 {
     public static class EventHubTrigger1
     {
+
+        static HttpClient client = new HttpClient();
+
         [FunctionName("EventHubTrigger1")]
         public static async Task Run([EventHubTrigger("nwluprn", Connection = "nwleventhub1_RootManageSharedAccessKey_EVENTHUB")] EventData[] events, ILogger log)
         {
             var exceptions = new List<Exception>();
+
+            
 
             foreach (EventData eventData in events)
             {
@@ -30,6 +38,13 @@ namespace nwl.uprnfinder
                     if (csvline.CustomerID == "10000")
                     {
                         log.LogInformation($"C# Event Hub trigger function processed the last message: {eventData.EventBody}");
+
+                        // Make a call to the following API endpoint: https://nwluprnapi.azurewebsites.net/api/HttpTrigger1?code=bgsYSm-_PlxnRQ0EU0YvfespzQ021leJh57vaEmf-py0AzFu4KwoSw== with the csvline object as the body
+                        HttpResponseMessage response = await client.PostAsJsonAsync("https://nwluprnapi.azurewebsites.net/api/HttpTrigger1?code=bgsYSm-_PlxnRQ0EU0YvfespzQ021leJh57vaEmf-py0AzFu4KwoSw==", csvline);
+                        
+                        // use response body for further work if needed...
+                        var responseBody = response.Content.ReadAsStringAsync();
+
                     }
 
                     await Task.Yield();
