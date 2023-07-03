@@ -13,7 +13,7 @@ namespace nwl.chunker
     public static class ServiceBusQueueTrigger1
     {
         [FunctionName("ServiceBusQueueTrigger1")]
-         public static async Task Run([ServiceBusTrigger("nwlnewfilequeue", Connection = "nwlsb1_SERVICEBUS")]string myQueueItem, 
+         public static async Task Run([ServiceBusTrigger("%ServiceBusQueueName%", Connection = "nwlsb1_SERVICEBUS")]string myQueueItem, 
                             [EventHub("%nwleventhub1_azurefunctionsender_EVENTHUB_name%", Connection = "nwleventhub1_RootManageSharedAccessKey_EVENTHUB")] IAsyncCollector<Azure.Messaging.EventHubs.EventData> outputEvents,
                             ILogger log)
         {
