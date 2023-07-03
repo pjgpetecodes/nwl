@@ -21,7 +21,7 @@ namespace nwl.uprnfinder
                 try
                 {
                     // Replace these two lines with your processing logic.
-                    log.LogInformation($"C# Event Hub trigger function processed a message: {eventData.EventBody}");
+                    //log.LogInformation($"C# Event Hub trigger function processed a message: {eventData.EventBody}");
 
                     // Cast the Event Body to a csvline object
                     var csvline = eventData.EventBody.ToObjectFromJson<CsvLine>();
